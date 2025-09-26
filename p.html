@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>WalkMate App</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f0fdf4;
+        }
+        .container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            padding: 1rem;
+        }
+    </style>
+</head>
+<body class="bg-gray-100">
+
+<div id="app" class="container">
+    <!-- Content will be rendered here by JavaScript -->
+</div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', () => {
+        // Simple state management
+        let isLoggedIn = false;
+        let userLocation = null;
+
+        // Function to render the login screen
+        function renderLogin() {
+            const app = document.getElementById('app');
+            app.innerHTML = `
+                <div class="bg-white p-8 rounded-xl shadow-lg w-full max-w-sm text-center">
+                    <h1 class="text-3xl font-bold text-gray-800 mb-6">Welcome to WalkMate</h1>
+                    <div class="space-y-4">
+                        <input id="email-input" type="email" placeholder="Email" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500">
+                        <input id="password-input" type="password" placeholder="Password" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500">
+                        <button id="login-btn" class="w-full bg-green-500 text-white font-semibold py-2 rounded-lg hover:bg-green-600 transition-colors">Login</button>
+                    </div>
+                </div>
+            `;
+
+            document.getElementById('login-btn').addEventListener('click', () => {
+                const email = document.getElementById('email-input').value;
+                console.log('Attempting login with email:', email);
+                isLoggedIn = true;
+                renderHome();
+            });
+        }
+
+        // Function to render the home screen
+        function renderHome() {
+            const app = document.getElementById('app');
+            app.innerHTML = `
+                <div class="bg-white p-8 rounded-xl shadow-lg w-full max-w-sm text-center">
+                    <h1 class="text-3xl font-bold text-gray-800 mb-6">Welcome to WalkMate</h1>
+                    <div id="location-display" class="text-lg text-gray-700">
+                        <p>Finding your location...</p>
+                        <div class="mt-4">
+                            <svg class="animate-spin h-8 w-8 text-green-500 mx-auto" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                                <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                                <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                            </svg>
+                        </div>
+                    </div>
+                </div>
+            `;
+
+            getLocation();
+        }
+
+        // Function to get user's location
+        function getLocation() {
+            const locationDisplay = document.getElementById('location-display');
+
+            if (navigator.geolocation) {
+                navigator.geolocation.getCurrentPosition(
+                    (position) => {
+                        userLocation = position;
+                        locationDisplay.innerHTML = `
+                            <p>Your location:</p>
+                            <p class="font-bold text-gray-900">${userLocation.coords.latitude.toFixed(6)}, ${userLocation.coords.longitude.toFixed(6)}</p>
+                        `;
+                    },
+                    (error) => {
+                        locationDisplay.innerHTML = `
+                            <p class="text-red-500">Error: ${error.message}</p>
+                            <p class="text-sm text-gray-500 mt-2">Please enable location services and try again.</p>
+                        `;
+                        console.error('Geolocation error:', error);
+                    },
+                    { enableHighAccuracy: true }
+                );
+            } else {
+                locationDisplay.innerHTML = `<p class="text-red-500">Geolocation is not supported by your browser.</p>`;
+            }
+        }
+
+        // Initial render
+        renderLogin();
+    });
+</script>
+
+</body>
+</html>
